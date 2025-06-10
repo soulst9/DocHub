@@ -7,10 +7,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10  # 전체 job 타임아웃
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -20,15 +21,163 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1
+      - name: Debug connection info
+        run: |
+          echo "🔍 Connection Details:"
+          echo "Host: ${{ secrets.EC2_HOST }}"
+          echo "Username: ${{ secrets.EC2_USER }}"
+          echo "Timestamp: $(date)"
+
+      - name: Test SSH Connection
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          timeout: 60s           # SSH 연결 타임아웃
+          command_timeout: 5s    # 명령 실행 타임아웃 (테스트용)
+          debug: true           # 상세 로그 출력
           script: |
+            echo "✅ SSH Connection successful!"
+            echo "🖥️  Server info: $(uname -a)"
+            echo "👤 Current user: $(whoami)"
+            echo "📂 Current directory: $(pwd)"
+            echo "🕒 Server time: $(date)"
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          timeout: 120s          # SSH 연결 타임아웃 (배포용)
+          command_timeout: 10m   # 명령 실행 타임아웃 (배포는 시간이 오래 걸림)
+          debug: true           # 상세 로그 출력
+          script: |
+            set -e  # 에러 발생시 즉시 중단
+            
+            echo "🚀 Starting deployment process..."
+            echo "📅 Deployment started at: $(date)"
+            
+            # 프로젝트 디렉토리 확인
+            echo "📂 Checking project directory..."
+            if [ ! -d "/home/ec2-user/DocHub" ]; then
+              echo "❌ Project directory not found!"
+              exit 1
+            fi
+            
             cd /home/ec2-user/DocHub
+            echo "✅ Changed to project directory: $(pwd)"
+            
+            # Git 상태 확인
+            echo "🔄 Checking git status..."
+            git status
+            
+            # 최신 코드 가져오기
+            echo "📥 Pulling latest code..."
             git pull origin main
+            
+            # 백엔드 디렉토리로 이동
+            echo "📂 Moving to backend directory..."
+            if [ ! -d "apps/backend" ]; then
+              echo "❌ Backend directory not found!"
+              exit 1
+            fi
+            
             cd apps/backend
-            pnpm install
-            pm2 restart app || pm2 start app.js --name app 
+            echo "✅ Changed to backend directory: $(pwd)"
+            
+            # pnpm 설치 상태 확인
+            echo "📦 Checking pnpm installation..."
+            if ! command -v pnpm &> /dev/null; then
+              echo "❌ pnpm not found, installing..."
+              npm install -g pnpm
+            else
+              echo "✅ pnpm found: $(pnpm --version)"
+            fi
+            
+            # 의존성 설치
+            echo "📦 Installing dependencies..."
+            pnpm install --production
+            
+            # PM2 상태 확인
+            echo "🔧 Checking PM2 status..."
+            if ! command -v pm2 &> /dev/null; then
+              echo "❌ PM2 not found, installing..."
+              pnpm add -g pm2
+            else
+              echo "✅ PM2 found: $(pm2 --version)"
+            fi
+            
+            # 현재 실행 중인 앱 확인
+            echo "📊 Current PM2 processes:"
+            pm2 list || echo "No PM2 processes running"
+            
+            # 앱 재시작 또는 시작
+            echo "🔄 Restarting application..."
+            if pm2 describe app > /dev/null 2>&1; then
+              echo "♻️  Restarting existing app..."
+              pm2 restart app
+            else
+              echo "🆕 Starting new app..."
+              if [ -f "app.js" ]; then
+                pm2 start app.js --name app
+              elif [ -f "server.js" ]; then
+                pm2 start server.js --name app
+              elif [ -f "index.js" ]; then
+                pm2 start index.js --name app
+              else
+                echo "❌ No main file found (app.js, server.js, index.js)"
+                exit 1
+              fi
+            fi
+            
+            # 배포 후 상태 확인
+            echo "📊 Post-deployment status:"
+            pm2 list
+            pm2 logs app --lines 10 || echo "No logs available"
+            
+            echo "✅ Deployment completed successfully!"
+            echo "📅 Deployment finished at: $(date)"
+
+      - name: Verify Deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          timeout: 30s
+          command_timeout: 10s
+          script: |
+            echo "🔍 Verifying deployment..."
+            
+            # 서버 상태 확인
+            if pm2 describe app > /dev/null 2>&1; then
+              echo "✅ App is running in PM2"
+              pm2 show app
+            else
+              echo "❌ App not found in PM2"
+              exit 1
+            fi
+            
+            # 포트 확인 (3000번 포트 예시)
+            if netstat -tlnp | grep :3000 > /dev/null 2>&1; then
+              echo "✅ App is listening on port 3000"
+            else
+              echo "⚠️  App might not be listening on port 3000"
+            fi
+            
+            echo "🎉 Verification completed!"
+
+  # 실패시 알림 (선택사항)
+  notify-on-failure:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: failure()
+    steps:
+      - name: Notify deployment failure
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Please check the logs above for details."
