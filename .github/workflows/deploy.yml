@@ -1,21 +1,37 @@
-name: Test SSH Connection
+name: Deploy to EC2
 
 on:
-  workflow_dispatch:  # 수동 실행용
+  push:
+    branches: [main]
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-      - name: Simple SSH Test
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          host: 15.164.170.20
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          timeout: 60s
-          script: |
-            echo "SSH connection successful!"
-            whoami
-            pwd
+          node-version: '22.16.0'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Deploy to EC2
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+          ssh -i ~/.ssh/deploy_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd /home/ec2-user/DocHub
+            git pull origin main
+            cd apps/backend
+            pnpm install --production
+            pm2 restart app || pm2 start app.js --name app
+          EOF
