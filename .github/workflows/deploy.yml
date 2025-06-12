@@ -29,7 +29,12 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ec2-user/DocHub
-            git pull origin main
+            
+            # 강제로 최신 코드 가져오기
+            echo "🔄 최신 코드 업데이트..."
+            git fetch origin
+            git reset --hard origin/main
+            git clean -fd
             
             # 기존 프로세스 정리
             echo "🧹 기존 프로세스 정리..."
@@ -46,6 +51,7 @@ jobs:
             # 프론트엔드 배포
             echo "🚀 프론트엔드 배포 시작..."
             cd ../frontend
+            rm -rf .next
             pnpm install
             pnpm build
             pm2 start "npx next start -p 3000" --name frontend
