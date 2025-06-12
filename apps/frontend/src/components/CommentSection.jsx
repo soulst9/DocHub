@@ -25,8 +25,8 @@ export default function CommentSection({ articleId, isOpen }) {
     
     setLoading(true);
     try {
-      const response = await ApiClient.get(`/comments/article/${articleId}`);
-      setComments(response.data);
+      const response = await ApiClient.request(`/api/v1/comments/article/${articleId}`);
+      setComments(response);
     } catch (error) {
       console.error('댓글 조회 실패:', error);
     } finally {
@@ -44,8 +44,11 @@ export default function CommentSection({ articleId, isOpen }) {
 
     setSubmitting(true);
     try {
-      const response = await ApiClient.post(`/comments/article/${articleId}`, newComment);
-      setComments([...comments, response.data]);
+      const response = await ApiClient.request(`/api/v1/comments/article/${articleId}`, {
+        method: 'POST',
+        body: JSON.stringify(newComment),
+      });
+      setComments([...comments, response]);
       setNewComment({ content: '', authorName: '', authorEmail: '' });
     } catch (error) {
       console.error('댓글 작성 실패:', error);
@@ -63,11 +66,12 @@ export default function CommentSection({ articleId, isOpen }) {
     }
 
     try {
-      const response = await ApiClient.put(`/comments/${commentId}`, {
-        content: editContent
+      const response = await ApiClient.request(`/api/v1/comments/${commentId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ content: editContent }),
       });
       setComments(comments.map(comment => 
-        comment.id === commentId ? response.data : comment
+        comment.id === commentId ? response : comment
       ));
       setEditingId(null);
       setEditContent('');
@@ -82,7 +86,9 @@ export default function CommentSection({ articleId, isOpen }) {
     if (!confirm('댓글을 삭제하시겠습니까?')) return;
 
     try {
-      await ApiClient.delete(`/comments/${commentId}`);
+      await ApiClient.request(`/api/v1/comments/${commentId}`, {
+        method: 'DELETE',
+      });
       setComments(comments.filter(comment => comment.id !== commentId));
     } catch (error) {
       console.error('댓글 삭제 실패:', error);
