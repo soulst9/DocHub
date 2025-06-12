@@ -9,6 +9,7 @@ import ArticleEditor from '../components/ArticleEditor';
 import ArticleViewer from '../components/ArticleViewer';
 import Pagination from '../components/Pagination';
 import StatisticsDashboard from '../components/StatisticsDashboard';
+import SearchAutocomplete from '../components/SearchAutocomplete';
 import ApiClient from '../utils/api';
 
 export default function MainPage() {
@@ -338,11 +339,11 @@ export default function MainPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     검색어
                   </label>
-                  <Input
-                    type="text"
-                    placeholder="검색어를 입력하세요..."
+                  <SearchAutocomplete
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(value) => setSearchTerm(value)}
+                    placeholder="검색어를 입력하세요..."
+                    articles={articles}
                     className="w-full"
                   />
                 </div>
