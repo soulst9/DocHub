@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
-export default function ArticleList({ articles, onEdit, onView, onToggleFavorite, searchTerm = '', searchType = 'all' }) {
+export default function ArticleList({ articles, onEdit, onView, onToggleFavorite, onTagClick, searchTerm = '', searchType = 'all' }) {
   if (!articles || articles.length === 0) {
     return (
       <div className="text-center py-12">
@@ -153,12 +153,17 @@ export default function ArticleList({ articles, onEdit, onView, onToggleFavorite
                   <Badge 
                     key={index} 
                     variant="outline" 
-                    className={`text-xs ${
+                    className={`text-xs cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors ${
                       searchTerm && (searchType === 'all' || searchType === 'tags') && 
                       tag.toLowerCase().includes(searchTerm.toLowerCase()) 
                         ? 'bg-yellow-100 border-yellow-300' 
                         : ''
                     }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTagClick?.(tag);
+                    }}
+                    title={`"${tag}" 태그로 필터링`}
                   >
                     #{searchTerm && (searchType === 'all' || searchType === 'tags') ? 
                       highlightText(tag, searchTerm) : 

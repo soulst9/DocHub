@@ -171,6 +171,14 @@ export default function MainPage() {
     );
   };
 
+  // 태그 클릭 핸들러 (단일 태그 필터링)
+  const handleTagClick = (tag) => {
+    setSelectedTags([tag]); // 기존 태그 선택을 초기화하고 클릭한 태그만 선택
+    setCurrentPage(1); // 첫 페이지로 이동
+    // 페이지 상단으로 스크롤
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // 검색 초기화
   const clearSearch = () => {
     setSearchTerm('');
@@ -268,6 +276,16 @@ export default function MainPage() {
             </div>
             
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                className={`inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 transition-colors ${
+                  showFavoritesOnly 
+                    ? 'bg-yellow-500 text-white hover:bg-yellow-600' 
+                    : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                ⭐ {showFavoritesOnly ? '전체 보기' : '즐겨찾기만'}
+              </button>
               <button
                 onClick={handleNewArticle}
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2 transition-colors"
@@ -481,6 +499,7 @@ export default function MainPage() {
             onEdit={handleEditArticle}
             onView={handleViewArticle}
             onToggleFavorite={handleToggleFavorite}
+            onTagClick={handleTagClick}
             searchTerm={searchTerm}
             searchType={searchType}
           />
