@@ -31,18 +31,24 @@ jobs:
             cd /home/ec2-user/DocHub
             git pull origin main
             
+            # 기존 프로세스 정리
+            echo "🧹 기존 프로세스 정리..."
+            pm2 delete app || true
+            pm2 delete frontend || true
+            pm2 delete backend || true
+            
             # 백엔드 배포
             echo "🚀 백엔드 배포 시작..."
             cd apps/backend
             pnpm install
-            pm2 restart backend || pm2 start app.js --name backend
+            pm2 start app.js --name backend
             
             # 프론트엔드 배포
             echo "🚀 프론트엔드 배포 시작..."
             cd ../frontend
             pnpm install
             pnpm build
-            pm2 restart frontend || pm2 start "npx next start -p 3000" --name frontend
+            pm2 start "npx next start -p 3000" --name frontend
             
             echo "✅ 배포 완료!"
             pm2 status
