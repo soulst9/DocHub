@@ -156,14 +156,37 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpda
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]}
               components={{
-                // 이미지 스타일링
+                // 이미지 스타일링 - 개선된 디자인
                 img: ({ src, alt, ...props }) => (
-                  <img 
-                    src={src} 
-                    alt={alt} 
-                    className="max-w-full h-auto rounded-lg shadow-sm border border-gray-200 my-4"
-                    {...props}
-                  />
+                  <div className="my-6 group">
+                    <div className="relative overflow-hidden rounded-xl bg-gray-50 border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src={src} 
+                        alt={alt} 
+                        className="w-full h-auto object-cover cursor-pointer transform group-hover:scale-105 transition-transform duration-300"
+                        onClick={() => window.open(src, '_blank')}
+                        {...props}
+                      />
+                      {/* 이미지 오버레이 */}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="bg-white bg-opacity-90 rounded-full p-2 shadow-lg">
+                            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* 이미지 캡션 */}
+                    {alt && (
+                      <div className="mt-2 text-center">
+                        <span className="text-sm text-gray-500 italic bg-gray-50 px-3 py-1 rounded-full">
+                          {alt}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 ),
                 // 코드 블록 스타일링
                 code: ({ node, inline, className, children, ...props }) => {
