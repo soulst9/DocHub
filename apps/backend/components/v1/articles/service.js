@@ -23,6 +23,7 @@ exports.createArticle = async (data) => {
     title: data.title,
     content: data.content,
     tags: data.tags,
+    links: data.links,
     categoryId: categoryId,
     authorId: authorId,
   });
@@ -66,6 +67,7 @@ exports.updateArticle = async (id, data) => {
     title: data.title,
     content: data.content,
     tags: data.tags,
+    links: data.links,
     categoryId: data.categoryId,
     authorId: data.authorId,
   });

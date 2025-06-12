@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const sequelize = require('./config/database');
 const { User, Category, Article, Tag, ArticleTag } = require('./models');
 
@@ -8,13 +9,19 @@ const app = express();
 app.use(express.json());
 app.use(cors()); // CORS 설정 추가
 
+// 정적 파일 서빙 (업로드된 이미지)
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 // v1 라우터 등록
 const userRouterV1 = require('./components/v1/users');
 const categoryRouterV1 = require('./components/v1/categories');
 const articleRouterV1 = require('./components/v1/articles');
+const uploadRouterV1 = require('./components/v1/uploads/router');
+
 app.use('/api/v1/users', userRouterV1);
 app.use('/api/v1/categories', categoryRouterV1);
 app.use('/api/v1/articles', articleRouterV1);
+app.use('/api/v1/uploads', uploadRouterV1);
 
 console.log(process.env.DB_HOST);
 

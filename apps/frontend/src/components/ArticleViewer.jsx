@@ -114,6 +114,29 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpda
               </div>
             )}
           </div>
+
+          {/* 관련 링크 */}
+          {article.links && article.links.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="flex items-start gap-2">
+                <span className="text-sm text-gray-600 mt-1">관련 링크:</span>
+                <div className="flex flex-col gap-2">
+                  {article.links.map((link, index) => (
+                    <a
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm hover:underline"
+                    >
+                      🔗 {link.title}
+                      <span className="text-xs text-gray-500">↗</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 내용 */}
@@ -122,6 +145,15 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpda
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]}
               components={{
+                // 이미지 스타일링
+                img: ({ src, alt, ...props }) => (
+                  <img 
+                    src={src} 
+                    alt={alt} 
+                    className="max-w-full h-auto rounded-lg shadow-sm border border-gray-200 my-4"
+                    {...props}
+                  />
+                ),
                 // 코드 블록 스타일링
                 code: ({ node, inline, className, children, ...props }) => {
                   return inline ? (

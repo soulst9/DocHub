@@ -12,43 +12,75 @@ async function runMigration() {
       )
     `);
     
-    // 이미 실행된 마이그레이션인지 확인
-    const [results] = await sequelize.query(`
+    // isFavorite 마이그레이션
+    const [favoriteResults] = await sequelize.query(`
       SELECT name FROM SequelizeMeta 
       WHERE name = '20241212-add-isfavorite-to-articles.js'
     `);
     
-    if (results.length > 0) {
-      console.log('✅ 마이그레이션이 이미 실행되었습니다.');
-      return;
-    }
-    
-    // isFavorite 컬럼이 이미 존재하는지 확인
-    const [columns] = await sequelize.query(`
-      SELECT COLUMN_NAME 
-      FROM INFORMATION_SCHEMA.COLUMNS 
-      WHERE TABLE_NAME = 'articles' 
-      AND COLUMN_NAME = 'isFavorite'
-    `);
-    
-    if (columns.length === 0) {
-      // 컬럼 추가
-      await sequelize.query(`
-        ALTER TABLE articles 
-        ADD COLUMN isFavorite BOOLEAN DEFAULT false NOT NULL
+    if (favoriteResults.length === 0) {
+      // isFavorite 컬럼이 이미 존재하는지 확인
+      const [favoriteColumns] = await sequelize.query(`
+        SELECT COLUMN_NAME 
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'articles' 
+        AND COLUMN_NAME = 'isFavorite'
       `);
-      console.log('✅ isFavorite 컬럼이 추가되었습니다.');
+      
+      if (favoriteColumns.length === 0) {
+        await sequelize.query(`
+          ALTER TABLE articles 
+          ADD COLUMN isFavorite BOOLEAN DEFAULT false NOT NULL
+        `);
+        console.log('✅ isFavorite 컬럼이 추가되었습니다.');
+      } else {
+        console.log('✅ isFavorite 컬럼이 이미 존재합니다.');
+      }
+      
+      // 마이그레이션 기록 추가
+      await sequelize.query(`
+        INSERT INTO SequelizeMeta (name) 
+        VALUES ('20241212-add-isfavorite-to-articles.js')
+      `);
     } else {
-      console.log('✅ isFavorite 컬럼이 이미 존재합니다.');
+      console.log('✅ isFavorite 마이그레이션이 이미 실행되었습니다.');
     }
     
-    // 마이그레이션 기록 추가
-    await sequelize.query(`
-      INSERT INTO SequelizeMeta (name) 
-      VALUES ('20241212-add-isfavorite-to-articles.js')
+    // links 마이그레이션
+    const [linksResults] = await sequelize.query(`
+      SELECT name FROM SequelizeMeta 
+      WHERE name = '20241212-add-links-to-articles.js'
     `);
     
-    console.log('🎉 마이그레이션이 성공적으로 완료되었습니다!');
+    if (linksResults.length === 0) {
+      // links 컬럼이 이미 존재하는지 확인
+      const [linksColumns] = await sequelize.query(`
+        SELECT COLUMN_NAME 
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = 'articles' 
+        AND COLUMN_NAME = 'links'
+      `);
+      
+      if (linksColumns.length === 0) {
+        await sequelize.query(`
+          ALTER TABLE articles 
+          ADD COLUMN links JSON
+        `);
+        console.log('✅ links 컬럼이 추가되었습니다.');
+      } else {
+        console.log('✅ links 컬럼이 이미 존재합니다.');
+      }
+      
+      // 마이그레이션 기록 추가
+      await sequelize.query(`
+        INSERT INTO SequelizeMeta (name) 
+        VALUES ('20241212-add-links-to-articles.js')
+      `);
+    } else {
+      console.log('✅ links 마이그레이션이 이미 실행되었습니다.');
+    }
+    
+    console.log('🎉 모든 마이그레이션이 성공적으로 완료되었습니다!');
     
   } catch (error) {
     console.error('❌ 마이그레이션 실패:', error.message);

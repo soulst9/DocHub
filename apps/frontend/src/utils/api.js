@@ -33,6 +33,27 @@ class ApiClient {
     }
   }
 
+  // 파일 업로드용 요청 (FormData)
+  async uploadRequest(endpoint, formData) {
+    const url = `${this.baseURL}${endpoint}`;
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData, // Content-Type 헤더를 설정하지 않음 (브라우저가 자동 설정)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Upload request failed:', error);
+      throw error;
+    }
+  }
+
   // Articles API
   async getArticles(params = {}) {
     const queryString = new URLSearchParams(params).toString();
@@ -67,6 +88,27 @@ class ApiClient {
   async toggleFavorite(id) {
     return this.request(`${API_CONFIG.ENDPOINTS.ARTICLES}/${id}/favorite`, {
       method: 'PATCH',
+    });
+  }
+
+  // Upload API
+  async uploadImage(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.uploadRequest('/api/v1/uploads/image', formData);
+  }
+
+  async uploadImages(files) {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+    return this.uploadRequest('/api/v1/uploads/images', formData);
+  }
+
+  async deleteImage(filename) {
+    return this.request(`/api/v1/uploads/image/${filename}`, {
+      method: 'DELETE',
     });
   }
 
