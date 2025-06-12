@@ -23,10 +23,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// 서버 및 DB 동기화
-sequelize.sync({ alter: true })
+// 서버 및 DB 동기화 - alter 대신 안전한 옵션 사용
+sequelize.sync({ force: false })
   .then(() => {
-    console.log('DB 및 테이블이 성공적으로 생성되었습니다.');
+    console.log('DB 연결 및 테이블 확인이 완료되었습니다.');
     app.listen(3001, () => {
       console.log('Express 서버가 3001번 포트에서 실행 중입니다.');
     });
