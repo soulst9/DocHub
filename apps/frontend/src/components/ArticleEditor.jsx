@@ -43,7 +43,7 @@ export default function ArticleEditor({ isOpen, onClose, onUpdate, editingArticl
         setFormData({
           title: editingArticle.title || '',
           content: editingArticle.content || '',
-          categoryId: editingArticle.category?.id || editingArticle.categoryId || '',
+          categoryId: editingArticle.Category?.id || editingArticle.categoryId || '',
           tags: editingArticle.tags || []
         });
       } else {

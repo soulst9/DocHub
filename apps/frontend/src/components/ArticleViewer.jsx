@@ -51,7 +51,7 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpda
               {article.title}
             </h1>
             <div className="flex items-center gap-4 text-sm text-gray-600">
-              <span>작성자: {article.author?.name || '작성자 미상'}</span>
+              <span>작성자: {article.User?.username || '작성자 미상'}</span>
               <span>작성일: {formatDate(article.createdAt)}</span>
               {article.updatedAt && article.updatedAt !== article.createdAt && (
                 <span>수정일: {formatDate(article.updatedAt)}</span>
@@ -92,11 +92,11 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpda
         {/* 메타 정보 */}
         <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
           <div className="flex flex-wrap items-center gap-4">
-            {article.category && (
+            {article.Category && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">카테고리:</span>
                 <Badge variant="secondary">
-                  {article.category.name}
+                  {article.Category.name}
                 </Badge>
               </div>
             )}

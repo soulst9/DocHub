@@ -29,11 +29,34 @@ exports.createArticle = async (data) => {
 };
 
 exports.getArticles = async () => {
-  return Article.findAll();
+  return Article.findAll({
+    include: [
+      {
+        model: Category,
+        attributes: ['id', 'name']
+      },
+      {
+        model: User,
+        attributes: ['id', 'username']
+      }
+    ],
+    order: [['createdAt', 'DESC']]
+  });
 };
 
 exports.getArticleById = async (id) => {
-  return Article.findByPk(id);
+  return Article.findByPk(id, {
+    include: [
+      {
+        model: Category,
+        attributes: ['id', 'name']
+      },
+      {
+        model: User,
+        attributes: ['id', 'username']
+      }
+    ]
+  });
 };
 
 exports.updateArticle = async (id, data) => {

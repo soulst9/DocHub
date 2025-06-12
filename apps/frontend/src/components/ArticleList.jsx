@@ -29,27 +29,34 @@ export default function ArticleList({ articles, onEdit, onView }) {
         <Card key={article.id} className="hover:shadow-lg transition-shadow duration-200">
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
-              <CardTitle 
-                className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-                onClick={() => onView?.(article)}
-              >
+              <CardTitle className="text-lg font-semibold text-gray-900">
                 {article.title}
               </CardTitle>
               <div className="flex gap-1 ml-2">
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={() => onView?.(article)}
+                  className="text-green-600 hover:text-green-700 hover:bg-green-50 px-2 py-1 h-auto"
+                  title="상세보기"
+                >
+                  👁️
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => onEdit?.(article)}
                   className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 h-auto"
+                  title="수정"
                 >
                   ✏️
                 </Button>
               </div>
             </div>
             
-            {article.category && (
+            {article.Category && (
               <Badge variant="secondary" className="w-fit text-xs">
-                {article.category.name}
+                {article.Category.name}
               </Badge>
             )}
           </CardHeader>
@@ -79,7 +86,7 @@ export default function ArticleList({ articles, onEdit, onView }) {
             
             <div className="flex items-center justify-between text-xs text-gray-500">
               <span>
-                {article.author?.name || '작성자 미상'}
+                {article.User?.username || '작성자 미상'}
               </span>
               <span>
                 {formatDate(article.createdAt)}

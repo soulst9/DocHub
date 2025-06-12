@@ -83,7 +83,7 @@ export default function MainPage() {
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          article.content.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || 
-                           (article.category && article.category.id.toString() === selectedCategory);
+                           (article.Category && article.Category.id.toString() === selectedCategory);
     return matchesSearch && matchesCategory;
   });
 
