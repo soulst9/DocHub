@@ -178,6 +178,29 @@ export default function MainPage() {
 
       {/* 메인 컨텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 임시 테스트 버튼 */}
+        <div className="mb-6 p-4 bg-yellow-100 border border-yellow-300 rounded-md">
+          <h3 className="text-lg font-bold mb-2">🧪 테스트 영역</h3>
+          <button
+            onClick={() => {
+              alert('메인 영역 새 문서 버튼 클릭됨!');
+              setShowArticleEditor(true);
+            }}
+            className="bg-green-600 text-white px-4 py-2 rounded mr-4"
+          >
+            🧪 테스트: 새 문서 작성
+          </button>
+          <button
+            onClick={() => {
+              alert('메인 영역 카테고리 버튼 클릭됨!');
+              setShowCategoryManager(true);
+            }}
+            className="bg-purple-600 text-white px-4 py-2 rounded"
+          >
+            🧪 테스트: 카테고리 관리
+          </button>
+        </div>
+
         {error && (
           <div className="mb-6 p-4 bg-yellow-100 border border-yellow-300 rounded-md text-yellow-800">
             {error}
