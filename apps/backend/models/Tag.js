@@ -8,4 +8,14 @@ const Tag = sequelize.define('Tag', {
   timestamps: false,
 });
 
+// 관계 설정을 위한 함수
+Tag.associate = (models) => {
+  if (models.Article && models.ArticleTag) {
+    Tag.belongsToMany(models.Article, { 
+      through: models.ArticleTag, 
+      foreignKey: 'tagId' 
+    });
+  }
+};
+
 module.exports = Tag; 

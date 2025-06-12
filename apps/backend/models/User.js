@@ -10,4 +10,13 @@ const User = sequelize.define('User', {
   timestamps: true,
 });
 
+// 관계 설정을 위한 함수
+User.associate = (models) => {
+  if (models.Article) {
+    User.hasMany(models.Article, { 
+      foreignKey: 'authorId' 
+    });
+  }
+};
+
 module.exports = User; 

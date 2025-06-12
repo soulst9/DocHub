@@ -20,4 +20,13 @@ const Comment = sequelize.define('Comment', {
   timestamps: true,
 });
 
+// 관계 설정을 위한 함수
+Comment.associate = (models) => {
+  if (models.Article) {
+    Comment.belongsTo(models.Article, { 
+      foreignKey: 'articleId' 
+    });
+  }
+};
+
 module.exports = Comment; 

@@ -21,18 +21,35 @@ Article.associate = (models) => {
     onDelete: 'CASCADE',
   });
   
-  // 기존 관계들
+  // 카테고리 관계
   if (models.Category) {
     Article.belongsTo(models.Category, {
-      foreignKey: 'category_id',
+      foreignKey: 'categoryId',
       as: 'Category',
     });
   }
   
+  // 사용자 관계
   if (models.User) {
     Article.belongsTo(models.User, {
-      foreignKey: 'user_id',
+      foreignKey: 'authorId',
       as: 'User',
+    });
+  }
+  
+  // 태그 관계
+  if (models.Tag && models.ArticleTag) {
+    Article.belongsToMany(models.Tag, { 
+      through: models.ArticleTag, 
+      foreignKey: 'articleId' 
+    });
+  }
+  
+  // 댓글 관계
+  if (models.Comment) {
+    Article.hasMany(models.Comment, { 
+      foreignKey: 'articleId', 
+      onDelete: 'CASCADE' 
     });
   }
 };

@@ -17,20 +17,6 @@ const models = {
   Comment,
 };
 
-// 관계 설정
-User.hasMany(Article, { foreignKey: 'authorId' });
-Article.belongsTo(User, { foreignKey: 'authorId' });
-
-Category.hasMany(Article, { foreignKey: 'categoryId' });
-Article.belongsTo(Category, { foreignKey: 'categoryId' });
-
-Article.belongsToMany(Tag, { through: ArticleTag, foreignKey: 'articleId' });
-Tag.belongsToMany(Article, { through: ArticleTag, foreignKey: 'tagId' });
-
-// 댓글 관계 설정
-Article.hasMany(Comment, { foreignKey: 'articleId', onDelete: 'CASCADE' });
-Comment.belongsTo(Article, { foreignKey: 'articleId' });
-
 // associate 함수 호출 (있는 경우)
 Object.keys(models).forEach(modelName => {
   if (models[modelName].associate) {

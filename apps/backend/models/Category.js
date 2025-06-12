@@ -11,4 +11,13 @@ const Category = sequelize.define('Category', {
   updatedAt: false,
 });
 
+// 관계 설정을 위한 함수
+Category.associate = (models) => {
+  if (models.Article) {
+    Category.hasMany(models.Article, { 
+      foreignKey: 'categoryId' 
+    });
+  }
+};
+
 module.exports = Category; 
