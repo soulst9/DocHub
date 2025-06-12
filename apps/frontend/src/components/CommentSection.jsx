@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { apiClient } from '@/lib/api';
+import ApiClient from '../utils/api';
 
 export default function CommentSection({ articleId, isOpen }) {
   const [comments, setComments] = useState([]);
@@ -25,7 +25,7 @@ export default function CommentSection({ articleId, isOpen }) {
     
     setLoading(true);
     try {
-      const response = await apiClient.get(`/comments/article/${articleId}`);
+      const response = await ApiClient.get(`/comments/article/${articleId}`);
       setComments(response.data);
     } catch (error) {
       console.error('댓글 조회 실패:', error);
@@ -44,7 +44,7 @@ export default function CommentSection({ articleId, isOpen }) {
 
     setSubmitting(true);
     try {
-      const response = await apiClient.post(`/comments/article/${articleId}`, newComment);
+      const response = await ApiClient.post(`/comments/article/${articleId}`, newComment);
       setComments([...comments, response.data]);
       setNewComment({ content: '', authorName: '', authorEmail: '' });
     } catch (error) {
@@ -63,7 +63,7 @@ export default function CommentSection({ articleId, isOpen }) {
     }
 
     try {
-      const response = await apiClient.put(`/comments/${commentId}`, {
+      const response = await ApiClient.put(`/comments/${commentId}`, {
         content: editContent
       });
       setComments(comments.map(comment => 
@@ -82,7 +82,7 @@ export default function CommentSection({ articleId, isOpen }) {
     if (!confirm('댓글을 삭제하시겠습니까?')) return;
 
     try {
-      await apiClient.delete(`/comments/${commentId}`);
+      await ApiClient.delete(`/comments/${commentId}`);
       setComments(comments.filter(comment => comment.id !== commentId));
     } catch (error) {
       console.error('댓글 삭제 실패:', error);
