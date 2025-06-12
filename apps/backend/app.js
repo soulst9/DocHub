@@ -25,8 +25,36 @@ app.get('/api/health', (req, res) => {
 
 // 서버 및 DB 동기화 - alter 대신 안전한 옵션 사용
 sequelize.sync({ force: false })
-  .then(() => {
+  .then(async () => {
     console.log('DB 연결 및 테이블 확인이 완료되었습니다.');
+    
+    // 기본 데이터 생성
+    try {
+      // 기본 사용자 생성 (ID: 1)
+      const [defaultUser] = await User.findOrCreate({
+        where: { id: 1 },
+        defaults: {
+          username: 'admin',
+          email: 'admin@dochub.com',
+          password: 'password123' // 실제 운영에서는 해시화 필요
+        }
+      });
+      console.log('기본 사용자 확인/생성 완료:', defaultUser.username);
+
+      // 기본 카테고리 생성
+      const [defaultCategory] = await Category.findOrCreate({
+        where: { name: '일반' },
+        defaults: {
+          name: '일반',
+          description: '기본 카테고리'
+        }
+      });
+      console.log('기본 카테고리 확인/생성 완료:', defaultCategory.name);
+
+    } catch (err) {
+      console.error('기본 데이터 생성 실패:', err);
+    }
+    
     app.listen(3001, () => {
       console.log('Express 서버가 3001번 포트에서 실행 중입니다.');
     });
