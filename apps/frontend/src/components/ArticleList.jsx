@@ -37,25 +37,59 @@ export default function ArticleList({ articles, onEdit, onView, onToggleFavorite
     );
   };
 
+  // 마크다운 문법 제거 함수
+  const cleanMarkdown = (content) => {
+    if (!content) return '';
+    
+    return content
+      // 이미지 마크다운 제거: ![alt](url) -> [이미지]
+      .replace(/!\[([^\]]*)\]\([^)]+\)/g, '[이미지]')
+      // 링크 마크다운 제거: [text](url) -> text
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // 볼드 제거: **text** -> text
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      // 이탤릭 제거: *text* -> text
+      .replace(/\*([^*]+)\*/g, '$1')
+      // 코드 블록 제거: ```code``` -> [코드]
+      .replace(/```[\s\S]*?```/g, '[코드 블록]')
+      // 인라인 코드 제거: `code` -> code
+      .replace(/`([^`]+)`/g, '$1')
+      // 헤딩 제거: # text -> text
+      .replace(/^#{1,6}\s+/gm, '')
+      // 리스트 마커 제거: - text -> text
+      .replace(/^[\s]*[-*+]\s+/gm, '')
+      // 번호 리스트 제거: 1. text -> text
+      .replace(/^[\s]*\d+\.\s+/gm, '')
+      // 인용 제거: > text -> text
+      .replace(/^>\s+/gm, '')
+      // 여러 줄바꿈을 하나로
+      .replace(/\n\s*\n/g, ' ')
+      // 앞뒤 공백 제거
+      .trim();
+  };
+
   // 내용 미리보기 생성 (검색어 주변 텍스트 표시)
   const getContentPreview = (content, searchTerm) => {
     if (!content) return '내용이 없습니다.';
     
+    // 마크다운 문법 제거
+    const cleanContent = cleanMarkdown(content);
+    
     if (!searchTerm) {
-      return content.substring(0, 150) + (content.length > 150 ? '...' : '');
+      return cleanContent.substring(0, 150) + (cleanContent.length > 150 ? '...' : '');
     }
 
-    const searchIndex = content.toLowerCase().indexOf(searchTerm.toLowerCase());
+    const searchIndex = cleanContent.toLowerCase().indexOf(searchTerm.toLowerCase());
     if (searchIndex === -1) {
-      return content.substring(0, 150) + (content.length > 150 ? '...' : '');
+      return cleanContent.substring(0, 150) + (cleanContent.length > 150 ? '...' : '');
     }
 
     // 검색어 주변 텍스트 추출
     const start = Math.max(0, searchIndex - 75);
-    const end = Math.min(content.length, searchIndex + searchTerm.length + 75);
+    const end = Math.min(cleanContent.length, searchIndex + searchTerm.length + 75);
     const preview = (start > 0 ? '...' : '') + 
-                   content.substring(start, end) + 
-                   (end < content.length ? '...' : '');
+                   cleanContent.substring(start, end) + 
+                   (end < cleanContent.length ? '...' : '');
     
     return preview;
   };
