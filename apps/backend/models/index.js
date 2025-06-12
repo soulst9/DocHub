@@ -31,17 +31,6 @@ Tag.belongsToMany(Article, { through: ArticleTag, foreignKey: 'tagId' });
 Article.hasMany(Comment, { foreignKey: 'articleId', onDelete: 'CASCADE' });
 Comment.belongsTo(Article, { foreignKey: 'articleId' });
 
-// 버전 관계 설정
-Article.hasMany(ArticleVersion, { 
-  foreignKey: 'article_id', 
-  as: 'versions',
-  onDelete: 'CASCADE' 
-});
-ArticleVersion.belongsTo(Article, { 
-  foreignKey: 'article_id', 
-  as: 'article' 
-});
-
 // associate 함수 호출 (있는 경우)
 Object.keys(models).forEach(modelName => {
   if (models[modelName].associate) {
