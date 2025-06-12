@@ -69,6 +69,26 @@ class ApiClient {
     return this.request(`${API_CONFIG.ENDPOINTS.CATEGORIES}/${id}`);
   }
 
+  async createCategory(data) {
+    return this.request(API_CONFIG.ENDPOINTS.CATEGORIES, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateCategory(id, data) {
+    return this.request(`${API_CONFIG.ENDPOINTS.CATEGORIES}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteCategory(id) {
+    return this.request(`${API_CONFIG.ENDPOINTS.CATEGORIES}/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Health Check
   async healthCheck() {
     return this.request(API_CONFIG.ENDPOINTS.HEALTH);

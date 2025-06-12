@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ApiClient from '../../utils/api';
+import CategoryManager from '../../components/CategoryManager';
 
 export default function MainPage() {
   const [search, setSearch] = useState('');
@@ -16,6 +17,9 @@ export default function MainPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // 모달 상태
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+
   // 더미 태그 (나중에 API로 변경 가능)
   const dummyTags = [
     { id: 1, name: 'React', color: 'bg-cyan-100 text-cyan-800' },
@@ -27,47 +31,52 @@ export default function MainPage() {
   ];
 
   // API 데이터 로드
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        
-        // 병렬로 데이터 로드
-        const [articlesResponse, categoriesResponse] = await Promise.all([
-          ApiClient.getArticles(),
-          ApiClient.getCategories()
-        ]);
-        
-        setArticles(articlesResponse || []);
-        setCategories(categoriesResponse || []);
-        setError(null);
-      } catch (err) {
-        console.error('데이터 로드 실패:', err);
-        setError('데이터를 불러오는데 실패했습니다.');
-        // 에러 시 더미 데이터 사용
-        setArticles([
-          {
-            id: 1,
-            title: 'React 컴포넌트 최적화 가이드',
-            author: '개발팀',
-            createdAt: '2024-01-15T00:00:00Z',
-            category: { name: '개발' },
-            tags: ['React', 'TypeScript'],
-            isStarred: true,
-            content: 'React 컴포넌트 최적화를 위한 핵심 기법들을 정리했습니다.'
-          }
-        ]);
-        setCategories([
-          { id: 1, name: '개발' },
-          { id: 2, name: '디자인' },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      
+      // 병렬로 데이터 로드
+      const [articlesResponse, categoriesResponse] = await Promise.all([
+        ApiClient.getArticles(),
+        ApiClient.getCategories()
+      ]);
+      
+      setArticles(articlesResponse || []);
+      setCategories(categoriesResponse || []);
+      setError(null);
+    } catch (err) {
+      console.error('데이터 로드 실패:', err);
+      setError('데이터를 불러오는데 실패했습니다.');
+      // 에러 시 더미 데이터 사용
+      setArticles([
+        {
+          id: 1,
+          title: 'React 컴포넌트 최적화 가이드',
+          author: '개발팀',
+          createdAt: '2024-01-15T00:00:00Z',
+          category: { name: '개발' },
+          tags: ['React', 'TypeScript'],
+          isStarred: true,
+          content: 'React 컴포넌트 최적화를 위한 핵심 기법들을 정리했습니다.'
+        }
+      ]);
+      setCategories([
+        { id: 1, name: '개발' },
+        { id: 2, name: '디자인' },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadData();
   }, []);
+
+  // 카테고리 업데이트 핸들러
+  const handleCategoryUpdate = () => {
+    loadData(); // 데이터 새로고침
+  };
 
   // 통계 계산
   const stats = [
@@ -84,6 +93,7 @@ export default function MainPage() {
     { icon: '⭐', label: '즐겨찾기' },
     { icon: '🕒', label: '최근 문서' },
     { icon: '📊', label: '통계' },
+    { icon: '⚙️', label: '카테고리 관리', onClick: () => setShowCategoryManager(true) },
   ];
 
   // 필터링된 문서
@@ -140,11 +150,14 @@ export default function MainPage() {
           <ul className="space-y-1">
             {sidebarItems.map((item, index) => (
               <li key={index}>
-                <button className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-sm transition-colors ${
-                  item.active 
-                    ? 'bg-blue-50 text-blue-700 font-medium' 
-                    : 'text-gray-700 hover:bg-gray-50'
-                }`}>
+                <button 
+                  onClick={item.onClick}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-sm transition-colors ${
+                    item.active 
+                      ? 'bg-blue-50 text-blue-700 font-medium' 
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
                   <span>{item.icon}</span>
                   <span>{item.label}</span>
                 </button>
@@ -363,6 +376,13 @@ export default function MainPage() {
           </div>
         </main>
       </div>
+
+      {/* 카테고리 관리 모달 */}
+      <CategoryManager 
+        isOpen={showCategoryManager}
+        onClose={() => setShowCategoryManager(false)}
+        onUpdate={handleCategoryUpdate}
+      />
     </div>
   );
 }
