@@ -23,8 +23,8 @@
 ## 기술 요구사항
 
 ### Frontend
-- **프레임워크**: React 18 + Vite
-- **스타일링**: shardcn (tailwind css)
+- **프레임워크**: React 18 + Next.js 15
+- **스타일링**: shadcn/ui (Tailwind CSS)
 - **마크다운**: React-Markdown
 - **에디터**: React-SimpleMDE-Editor
 - **검색**: Fuse.js (퍼지 검색)
@@ -32,13 +32,13 @@
 ### Backend
 - **런타임**: Node.js 18+
 - **프레임워크**: Express.js
-- **데이터베이스**: SQLite3
+- **데이터베이스**: MySQL
 - **API**: RESTful API
 
 ### 개발 환경
-- **패키지 매니저**: npm
-- **번들러**: Vite
-- **개발 서버**: Express + Vite Dev Server
+- **패키지 매니저**: pnpm
+- **번들러**: Next.js (내장 Webpack)
+- **개발 서버**: Express + Next.js Dev Server
 
 ## 데이터 모델
 
@@ -103,9 +103,9 @@ CREATE TABLE categories (
 
 ### Week 1 (1-7일)
 1. **프로젝트 셋업** (1일)
-   - React + Vite 프로젝트 생성
+   - React + Next.js 프로젝트 생성
    - Express 서버 설정
-   - SQLite 데이터베이스 연결
+   - MySQL 데이터베이스 연결
 
 2. **기본 CRUD** (3일)
    - 문서 작성/조회/수정/삭제 API
@@ -138,7 +138,7 @@ CREATE TABLE categories (
 - 검색 기능이 제목, 내용, 태그에서 작동
 - 카테고리별 분류 및 필터링 가능
 - 반응형 UI로 모바일에서도 사용 가능
-- SQLite 데이터베이스에 데이터 영구 저장
+- MySQL 데이터베이스에 데이터 영구 저장
 
 ## 제약사항
 - 사용자 인증 기능 없음 (단순 프로토타입)
@@ -148,36 +148,51 @@ CREATE TABLE categories (
 
 ## 폴더 구조
 ```
-knowledge-wiki/
+DocHub/
 ├── package.json
-├── server.js
-├── database.db
-├── public/
-│   └── index.html
-├── src/
-│   ├── components/
-│   │   ├── Header.jsx
-│   │   ├── Sidebar.jsx
-│   │   ├── SearchBar.jsx
-│   │   ├── ArticleList.jsx
-│   │   ├── ArticleCard.jsx
-│   │   ├── ArticleEditor.jsx
-│   │   └── MarkdownRenderer.jsx
-│   ├── pages/
-│   │   ├── Home.jsx
-│   │   ├── ArticleDetail.jsx
-│   │   ├── ArticleEdit.jsx
-│   │   └── SearchResults.jsx
-│   ├── utils/
-│   │   ├── api.js
-│   │   └── helpers.js
-│   ├── styles/
-│   │   └── index.css
-│   └── App.jsx
-├── routes/
-│   ├── articles.js
-│   ├── search.js
-│   └── categories.js
-└── database/
-    └── init.sql
+├── pnpm-workspace.yaml
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+├── apps/
+│   ├── frontend/                    # Next.js 프론트엔드
+│   │   ├── package.json
+│   │   ├── next.config.ts
+│   │   ├── tailwind.config.js
+│   │   ├── src/
+│   │   │   ├── app/                 # Next.js App Router
+│   │   │   │   ├── layout.tsx
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── globals.css
+│   │   │   ├── components/
+│   │   │   │   ├── ui/              # shadcn/ui 컴포넌트
+│   │   │   │   ├── ArticleList.jsx
+│   │   │   │   ├── ArticleEditor.jsx
+│   │   │   │   ├── ArticleViewer.jsx
+│   │   │   │   └── CategoryManager.jsx
+│   │   │   ├── pages/
+│   │   │   │   └── MainPage.jsx
+│   │   │   ├── utils/
+│   │   │   │   └── api.js
+│   │   │   └── config/
+│   │   │       └── api.js
+│   │   └── public/
+│   └── backend/                     # Express.js 백엔드
+│       ├── package.json
+│       ├── app.js
+│       ├── routes/
+│       │   ├── articles.js
+│       │   ├── categories.js
+│       │   └── search.js
+│       ├── models/
+│       │   ├── Article.js
+│       │   └── Category.js
+│       ├── config/
+│       │   └── database.js
+│       └── middleware/
+├── scripts/
+│   ├── prd.txt
+│   └── example_prd.txt
+└── tasks/
+    └── tasks.json
 ```
