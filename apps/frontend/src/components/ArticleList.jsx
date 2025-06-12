@@ -90,19 +90,10 @@ export default function ArticleList({ articles, onEdit, onView, onToggleFavorite
                   variant="outline"
                   size="sm"
                   onClick={() => onView?.(article)}
-                  className="text-green-600 hover:text-green-700 hover:bg-green-50 px-2 py-1 h-auto"
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 h-auto"
                   title="상세보기"
                 >
-                  👁️
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEdit?.(article)}
-                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 h-auto"
-                  title="수정"
-                >
-                  ✏️
+                  📖
                 </Button>
               </div>
             </div>
