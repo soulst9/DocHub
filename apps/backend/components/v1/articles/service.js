@@ -39,10 +39,12 @@ exports.getArticles = async () => {
     include: [
       {
         model: Category,
+        as: 'Category',
         attributes: ['id', 'name']
       },
       {
         model: User,
+        as: 'User',
         attributes: ['id', 'username']
       }
     ],
@@ -55,10 +57,12 @@ exports.getArticleById = async (id) => {
     include: [
       {
         model: Category,
+        as: 'Category',
         attributes: ['id', 'name']
       },
       {
         model: User,
+        as: 'User',
         attributes: ['id', 'username']
       }
     ]
@@ -127,10 +131,12 @@ exports.getVersions = async (articleId) => {
     include: [
       {
         model: Category,
+        as: 'Category',
         attributes: ['id', 'name']
       },
       {
         model: User,
+        as: 'User',
         attributes: ['id', 'username']
       }
     ],
@@ -147,10 +153,12 @@ exports.getVersionById = async (articleId, versionNumber) => {
     include: [
       {
         model: Category,
+        as: 'Category',
         attributes: ['id', 'name']
       },
       {
         model: User,
+        as: 'User',
         attributes: ['id', 'username']
       }
     ]
