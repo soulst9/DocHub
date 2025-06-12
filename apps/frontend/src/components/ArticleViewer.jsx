@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import ApiClient from '../utils/api';
 
-export default function ArticleViewer({ article, isOpen, onClose, onEdit }) {
+export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpdate }) {
+  const [loading, setLoading] = useState(false);
+
   if (!isOpen || !article) return null;
 
   const formatDate = (dateString) => {
@@ -17,15 +22,23 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit }) {
     });
   };
 
-  // 마크다운 기본 렌더링 (간단한 변환)
-  const renderContent = (content) => {
-    if (!content) return '';
-    
-    return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>')
-      .replace(/\n/g, '<br>');
+  // 문서 삭제
+  const handleDelete = async () => {
+    if (!confirm(`"${article.title}" 문서를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await ApiClient.deleteArticle(article.id);
+      onUpdate?.(); // 부모 컴포넌트에 업데이트 알림
+      onClose(); // 모달 닫기
+    } catch (err) {
+      console.error('문서 삭제 실패:', err);
+      alert('문서 삭제에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,14 +64,25 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit }) {
               variant="outline"
               size="sm"
               className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              disabled={loading}
             >
               ✏️ 수정
             </Button>
             <Button 
               variant="outline" 
               size="sm" 
+              onClick={handleDelete}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              disabled={loading}
+            >
+              🗑️ 삭제
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700"
+              disabled={loading}
             >
               ✕
             </Button>
@@ -94,12 +118,55 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit }) {
 
         {/* 내용 */}
         <div className="flex-1 overflow-y-auto p-6">
-          <div 
-            className="prose prose-sm max-w-none text-gray-800 leading-relaxed"
-            dangerouslySetInnerHTML={{ 
-              __html: renderContent(article.content) 
-            }}
-          />
+          <div className="prose prose-sm max-w-none text-gray-800 leading-relaxed">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                // 코드 블록 스타일링
+                code: ({ node, inline, className, children, ...props }) => {
+                  return inline ? (
+                    <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono" {...props}>
+                      {children}
+                    </code>
+                  ) : (
+                    <code className="block bg-gray-100 p-3 rounded text-sm font-mono overflow-x-auto" {...props}>
+                      {children}
+                    </code>
+                  );
+                },
+                // 링크 스타일링
+                a: ({ children, href, ...props }) => (
+                  <a 
+                    href={href} 
+                    className="text-blue-600 hover:text-blue-800 underline" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    {...props}
+                  >
+                    {children}
+                  </a>
+                ),
+                // 테이블 스타일링
+                table: ({ children, ...props }) => (
+                  <table className="min-w-full border-collapse border border-gray-300" {...props}>
+                    {children}
+                  </table>
+                ),
+                th: ({ children, ...props }) => (
+                  <th className="border border-gray-300 px-4 py-2 bg-gray-100 font-semibold" {...props}>
+                    {children}
+                  </th>
+                ),
+                td: ({ children, ...props }) => (
+                  <td className="border border-gray-300 px-4 py-2" {...props}>
+                    {children}
+                  </td>
+                ),
+              }}
+            >
+              {article.content || '내용이 없습니다.'}
+            </ReactMarkdown>
+          </div>
         </div>
 
         {/* 푸터 */}

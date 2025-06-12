@@ -294,6 +294,7 @@ export default function MainPage() {
         isOpen={showArticleViewer}
         onClose={() => setShowArticleViewer(false)}
         onEdit={handleEditArticle}
+        onUpdate={handleArticleUpdate}
       />
     </div>
   );
