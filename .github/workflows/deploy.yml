@@ -30,11 +30,25 @@ jobs:
           script: |
             cd /home/ec2-user/DocHub
             
+            # 업로드 폴더 백업
+            echo "📁 업로드 폴더 백업..."
+            if [ -d "apps/backend/public/uploads" ]; then
+              cp -r apps/backend/public/uploads /tmp/uploads_backup
+            fi
+            
             # 강제로 최신 코드 가져오기
             echo "🔄 최신 코드 업데이트..."
             git fetch origin
             git reset --hard origin/main
             git clean -fd
+            
+            # 업로드 폴더 복원
+            echo "📁 업로드 폴더 복원..."
+            if [ -d "/tmp/uploads_backup" ]; then
+              mkdir -p apps/backend/public
+              cp -r /tmp/uploads_backup apps/backend/public/uploads
+              rm -rf /tmp/uploads_backup
+            fi
             
             # 기존 프로세스 정리
             echo "🧹 기존 프로세스 정리..."
