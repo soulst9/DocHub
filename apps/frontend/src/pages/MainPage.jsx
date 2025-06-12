@@ -283,7 +283,7 @@ export default function MainPage() {
       />
 
       <ArticleEditor
-        article={editingArticle}
+        editingArticle={editingArticle}
         isOpen={showArticleEditor}
         onClose={() => setShowArticleEditor(false)}
         onUpdate={handleArticleUpdate}
