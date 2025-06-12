@@ -16,6 +16,9 @@ export default function MainPage() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [sortBy, setSortBy] = useState('newest'); // newest, oldest, title, category
+  const [searchType, setSearchType] = useState('all'); // all, title, content, tags
   
   // 모달 상태
   const [showCategoryManager, setShowCategoryManager] = useState(false);
@@ -78,14 +81,86 @@ export default function MainPage() {
     loadData();
   }, []);
 
-  // 검색 및 필터링
-  const filteredArticles = articles.filter(article => {
-    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         article.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || 
-                           (article.Category && article.Category.id.toString() === selectedCategory);
-    return matchesSearch && matchesCategory;
-  });
+  // 모든 태그 추출
+  const allTags = [...new Set(articles.flatMap(article => article.tags || []))];
+
+  // 고급 검색 및 필터링
+  const filteredAndSortedArticles = (() => {
+    let filtered = articles.filter(article => {
+      // 검색어 필터링
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        const titleMatch = article.title.toLowerCase().includes(searchLower);
+        const contentMatch = article.content.toLowerCase().includes(searchLower);
+        const tagMatch = article.tags?.some(tag => tag.toLowerCase().includes(searchLower));
+        
+        switch (searchType) {
+          case 'title':
+            if (!titleMatch) return false;
+            break;
+          case 'content':
+            if (!contentMatch) return false;
+            break;
+          case 'tags':
+            if (!tagMatch) return false;
+            break;
+          default: // 'all'
+            if (!titleMatch && !contentMatch && !tagMatch) return false;
+        }
+      }
+
+      // 카테고리 필터링
+      if (selectedCategory) {
+        const categoryMatch = article.Category && article.Category.id.toString() === selectedCategory;
+        if (!categoryMatch) return false;
+      }
+
+      // 태그 필터링
+      if (selectedTags.length > 0) {
+        const hasSelectedTags = selectedTags.every(selectedTag => 
+          article.tags?.includes(selectedTag)
+        );
+        if (!hasSelectedTags) return false;
+      }
+
+      return true;
+    });
+
+    // 정렬
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest':
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        case 'title':
+          return a.title.localeCompare(b.title);
+        case 'category':
+          const aCat = a.Category?.name || '';
+          const bCat = b.Category?.name || '';
+          return aCat.localeCompare(bCat);
+        default: // 'newest'
+          return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+    });
+
+    return filtered;
+  })();
+
+  // 태그 토글 핸들러
+  const toggleTag = (tag) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  // 검색 초기화
+  const clearSearch = () => {
+    setSearchTerm('');
+    setSelectedCategory('');
+    setSelectedTags([]);
+    setSearchType('all');
+  };
 
   // 문서 관련 핸들러
   const handleNewArticle = () => {
@@ -164,24 +239,56 @@ export default function MainPage() {
         <div className="mb-8">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-gray-900">
-                문서 검색 및 필터
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold text-gray-900">
+                  🔍 고급 검색 및 필터
+                </CardTitle>
+                {(searchTerm || selectedCategory || selectedTags.length > 0) && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={clearSearch}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    초기화
+                  </Button>
+                )}
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+            <CardContent className="space-y-4">
+              {/* 첫 번째 행: 검색어와 검색 타입 */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     검색어
                   </label>
                   <Input
                     type="text"
-                    placeholder="제목이나 내용으로 검색..."
+                    placeholder="검색어를 입력하세요..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    검색 범위
+                  </label>
+                  <select
+                    value={searchType}
+                    onChange={(e) => setSearchType(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">전체</option>
+                    <option value="title">제목만</option>
+                    <option value="content">내용만</option>
+                    <option value="tags">태그만</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* 두 번째 행: 카테고리와 정렬 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     카테고리
@@ -199,7 +306,71 @@ export default function MainPage() {
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    정렬
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="newest">최신순</option>
+                    <option value="oldest">오래된순</option>
+                    <option value="title">제목순</option>
+                    <option value="category">카테고리순</option>
+                  </select>
+                </div>
               </div>
+
+              {/* 세 번째 행: 태그 필터링 */}
+              {allTags.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    태그 필터 ({selectedTags.length}개 선택됨)
+                  </label>
+                  <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                    {allTags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant={selectedTags.includes(tag) ? "default" : "outline"}
+                        className={`cursor-pointer transition-colors ${
+                          selectedTags.includes(tag) 
+                            ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                            : 'hover:bg-gray-100'
+                        }`}
+                        onClick={() => toggleTag(tag)}
+                      >
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 선택된 필터 표시 */}
+              {(searchTerm || selectedCategory || selectedTags.length > 0) && (
+                <div className="pt-2 border-t border-gray-200">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm text-gray-600">활성 필터:</span>
+                    {searchTerm && (
+                      <Badge variant="secondary" className="text-xs">
+                        검색: "{searchTerm}"
+                      </Badge>
+                    )}
+                    {selectedCategory && (
+                      <Badge variant="secondary" className="text-xs">
+                        카테고리: {categories.find(c => c.id.toString() === selectedCategory)?.name}
+                      </Badge>
+                    )}
+                    {selectedTags.map(tag => (
+                      <Badge key={tag} variant="secondary" className="text-xs">
+                        태그: #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -242,7 +413,7 @@ export default function MainPage() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">검색 결과</p>
-                  <p className="text-2xl font-bold text-gray-900">{filteredArticles.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{filteredAndSortedArticles.length}</p>
                 </div>
               </div>
             </CardContent>
@@ -260,17 +431,19 @@ export default function MainPage() {
                 </span>
               )}
             </h2>
-            {filteredArticles.length > 0 && (
+            {filteredAndSortedArticles.length > 0 && (
               <p className="text-sm text-gray-600">
-                {filteredArticles.length}개의 문서
+                {filteredAndSortedArticles.length}개의 문서
               </p>
             )}
           </div>
           
           <ArticleList 
-            articles={filteredArticles}
+            articles={filteredAndSortedArticles}
             onEdit={handleEditArticle}
             onView={handleViewArticle}
+            searchTerm={searchTerm}
+            searchType={searchType}
           />
         </div>
       </main>
