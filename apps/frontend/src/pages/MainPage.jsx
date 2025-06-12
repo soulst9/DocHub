@@ -153,25 +153,24 @@ export default function MainPage() {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button
+              <button
                 onClick={() => {
                   alert('새 문서 버튼 클릭됨!'); // 긴급 테스트
                   handleNewArticle();
                 }}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2 transition-colors"
               >
                 ✏️ 새 문서 작성
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={() => {
                   alert('카테고리 버튼 클릭됨!'); // 비교 테스트
                   setShowCategoryManager(true);
                 }}
-                variant="outline"
-                className="text-gray-600 hover:text-gray-800"
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 h-10 px-4 py-2 transition-colors"
               >
                 ⚙️ 카테고리 관리
-              </Button>
+              </button>
             </div>
           </div>
         </div>
