@@ -154,13 +154,19 @@ export default function MainPage() {
             
             <div className="flex items-center gap-3">
               <Button
-                onClick={handleNewArticle}
+                onClick={() => {
+                  alert('새 문서 버튼 클릭됨!'); // 긴급 테스트
+                  handleNewArticle();
+                }}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 ✏️ 새 문서 작성
               </Button>
               <Button
-                onClick={() => setShowCategoryManager(true)}
+                onClick={() => {
+                  alert('카테고리 버튼 클릭됨!'); // 비교 테스트
+                  setShowCategoryManager(true);
+                }}
                 variant="outline"
                 className="text-gray-600 hover:text-gray-800"
               >
