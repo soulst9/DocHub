@@ -155,8 +155,14 @@ export default function MainPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => {
+                  console.log('=== 새 문서 버튼 클릭 시작 ===');
                   alert('새 문서 버튼 클릭됨!'); // 긴급 테스트
+                  console.log('Alert 표시 완료');
+                  console.log('현재 showArticleEditor 상태:', showArticleEditor);
+                  console.log('현재 editingArticle 상태:', editingArticle);
                   handleNewArticle();
+                  console.log('handleNewArticle 호출 완료');
+                  console.log('=== 새 문서 버튼 클릭 종료 ===');
                 }}
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2 transition-colors"
               >
