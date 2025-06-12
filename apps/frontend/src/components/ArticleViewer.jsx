@@ -43,47 +43,6 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpda
     }
   };
 
-  // PDF 다운로드
-  const handleDownloadPDF = async () => {
-    try {
-      setLoading(true);
-      
-      // PDF 다운로드 요청
-      const response = await fetch(`${ApiClient.baseURL}/api/v1/articles/${article.id}/pdf`);
-      
-      if (!response.ok) {
-        throw new Error('PDF 다운로드에 실패했습니다.');
-      }
-      
-      // Blob으로 변환
-      const blob = await response.blob();
-      
-      // 다운로드 링크 생성
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      
-      // 파일명 설정
-      const safeTitle = article.title.replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_');
-      const filename = `${safeTitle}_${new Date().toISOString().split('T')[0]}.pdf`;
-      link.download = filename;
-      
-      // 다운로드 실행
-      document.body.appendChild(link);
-      link.click();
-      
-      // 정리
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-    } catch (err) {
-      console.error('PDF 다운로드 실패:', err);
-      alert('PDF 다운로드에 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -128,15 +87,6 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpda
               disabled={loading}
             >
               🗑️ 삭제
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleDownloadPDF}
-              className="text-gray-500 hover:text-gray-700"
-              disabled={loading}
-            >
-              📄 PDF 다운로드
             </Button>
             <Button 
               variant="outline" 

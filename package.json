@@ -2,9 +2,14 @@
   "name": "dochub-frontend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "next dev -p 3001",
-    "build": "next build",
-    "start": "next start",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd apps/backend && npm run dev",
+    "dev:frontend": "cd apps/frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd apps/backend && npm run build",
+    "build:frontend": "cd apps/frontend && npm run build",
+    "start": "npm run start:backend",
+    "start:backend": "cd apps/backend && npm start",
     "lint": "next lint"
   },
   "devDependencies": {
@@ -29,9 +34,7 @@
     "clsx": "^2.0.0",
     "express-validator": "^7.2.1",
     "lucide-react": "^0.400.0",
-    "marked": "^15.0.12",
     "next": "^14.0.0",
-    "puppeteer": "^24.10.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "tailwind-merge": "^2.0.0",

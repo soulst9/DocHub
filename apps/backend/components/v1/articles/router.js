@@ -9,8 +9,6 @@ router.post('/', validator.createArticle, controller.createArticle);
 router.get('/', controller.getArticles);
 // 문서 상세
 router.get('/:id', controller.getArticleById);
-// 문서 PDF 다운로드
-router.get('/:id/pdf', controller.downloadPDF);
 // 문서 수정
 router.put('/:id', validator.updateArticle, controller.updateArticle);
 // 문서 삭제
