@@ -106,6 +106,11 @@ class ApiClient {
     });
   }
 
+  // 통계 API
+  async getStatistics() {
+    return this.request(`${API_CONFIG.ENDPOINTS.ARTICLES}/statistics`);
+  }
+
   // Upload API
   async uploadImage(file) {
     const formData = new FormData();

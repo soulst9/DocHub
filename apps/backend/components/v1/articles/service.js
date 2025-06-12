@@ -186,4 +186,68 @@ exports.restoreVersion = async (articleId, versionNumber) => {
   });
 
   return article;
+};
+
+// 통계 조회 함수
+exports.getStatistics = async () => {
+  const { Op } = require('sequelize');
+  
+  // 총 문서 수
+  const totalArticles = await Article.count();
+  
+  // 즐겨찾기 문서 수
+  const favoriteArticles = await Article.count({
+    where: { isFavorite: true }
+  });
+  
+  // 카테고리별 문서 수
+  const articlesByCategory = await Article.findAll({
+    attributes: [
+      [require('sequelize').fn('COUNT', require('sequelize').col('Article.id')), 'count']
+    ],
+    include: [
+      {
+        model: Category,
+        as: 'Category',
+        attributes: ['id', 'name'],
+        required: false
+      }
+    ],
+    group: ['Category.id', 'Category.name'],
+    raw: true
+  });
+  
+  // 최근 7일간 작성된 문서 수
+  const recentArticles = await Article.count({
+    where: {
+      createdAt: {
+        [Op.gte]: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      }
+    }
+  });
+  
+  // 최근 작성된 문서 5개
+  const latestArticles = await Article.findAll({
+    attributes: ['id', 'title', 'createdAt'],
+    include: [
+      {
+        model: Category,
+        as: 'Category',
+        attributes: ['name']
+      }
+    ],
+    order: [['createdAt', 'DESC']],
+    limit: 5
+  });
+  
+  return {
+    totalArticles,
+    favoriteArticles,
+    recentArticles,
+    articlesByCategory: articlesByCategory.map(item => ({
+      categoryName: item['Category.name'] || '미분류',
+      count: parseInt(item.count)
+    })),
+    latestArticles
+  };
 }; 

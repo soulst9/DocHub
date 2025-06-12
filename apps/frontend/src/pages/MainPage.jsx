@@ -8,6 +8,7 @@ import CategoryManager from '../components/CategoryManager';
 import ArticleEditor from '../components/ArticleEditor';
 import ArticleViewer from '../components/ArticleViewer';
 import Pagination from '../components/Pagination';
+import StatisticsDashboard from '../components/StatisticsDashboard';
 import ApiClient from '../utils/api';
 
 export default function MainPage() {
@@ -452,64 +453,8 @@ export default function MainPage() {
           </Card>
         </div>
 
-        {/* 통계 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <span className="text-2xl">📄</span>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">전체 문서</p>
-                  <p className="text-2xl font-bold text-gray-900">{articles.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <span className="text-2xl">⭐</span>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">즐겨찾기</p>
-                  <p className="text-2xl font-bold text-gray-900">{articles.filter(a => a.isFavorite).length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <span className="text-2xl">📁</span>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">카테고리</p>
-                  <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <span className="text-2xl">🔍</span>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">검색 결과</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalFilteredItems}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* 통계 대시보드 */}
+        <StatisticsDashboard />
 
         {/* 문서 목록 */}
         <div className="mb-8">

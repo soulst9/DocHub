@@ -87,4 +87,14 @@ exports.restoreVersion = async (req, res) => {
   } catch (err) {
     handleError(res, err);
   }
+};
+
+// 통계 조회 컨트롤러
+exports.getStatistics = async (req, res) => {
+  try {
+    const statistics = await service.getStatistics();
+    res.json(statistics);
+  } catch (err) {
+    handleError(res, err);
+  }
 }; 

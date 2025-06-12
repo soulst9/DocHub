@@ -3,6 +3,9 @@ const controller = require('./controller');
 const validator = require('./validator');
 const router = express.Router();
 
+// 통계 조회 (다른 라우트보다 먼저 배치)
+router.get('/statistics', controller.getStatistics);
+
 // 문서 생성
 router.post('/', validator.createArticle, controller.createArticle);
 // 문서 목록
