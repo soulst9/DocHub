@@ -89,37 +89,19 @@ export default function MainPage() {
 
   // 문서 관련 핸들러
   const handleNewArticle = () => {
-    console.log('새 문서 버튼 클릭됨');
-    try {
-      setEditingArticle(null);
-      setShowArticleEditor(true);
-      console.log('새 문서 모달 상태 변경 완료');
-    } catch (error) {
-      console.error('새 문서 버튼 에러:', error);
-    }
+    setEditingArticle(null);
+    setShowArticleEditor(true);
   };
 
   const handleEditArticle = (article) => {
-    console.log('문서 수정 버튼 클릭됨:', article);
-    try {
-      setEditingArticle(article);
-      setShowArticleEditor(true);
-      setShowArticleViewer(false);
-      console.log('수정 모달 상태 변경 완료');
-    } catch (error) {
-      console.error('문서 수정 에러:', error);
-    }
+    setEditingArticle(article);
+    setShowArticleEditor(true);
+    setShowArticleViewer(false);
   };
 
   const handleViewArticle = (article) => {
-    console.log('문서 보기 클릭됨:', article);
-    try {
-      setViewingArticle(article);
-      setShowArticleViewer(true);
-      console.log('보기 모달 상태 변경 완료');
-    } catch (error) {
-      console.error('문서 보기 에러:', error);
-    }
+    setViewingArticle(article);
+    setShowArticleViewer(true);
   };
 
   const handleArticleUpdate = () => {
@@ -154,19 +136,13 @@ export default function MainPage() {
             
             <div className="flex items-center gap-3">
               <button
-                onClick={() => {
-                  alert('새 문서 버튼 클릭됨!');
-                  setShowArticleEditor(true);
-                }}
+                onClick={handleNewArticle}
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2 transition-colors"
               >
                 ✏️ 새 문서 작성
               </button>
               <button
-                onClick={() => {
-                  alert('카테고리 버튼 클릭됨!'); // 비교 테스트
-                  setShowCategoryManager(true);
-                }}
+                onClick={() => setShowCategoryManager(true)}
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 h-10 px-4 py-2 transition-colors"
               >
                 ⚙️ 카테고리 관리
@@ -178,29 +154,6 @@ export default function MainPage() {
 
       {/* 메인 컨텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 임시 테스트 버튼 */}
-        <div className="mb-6 p-4 bg-yellow-100 border border-yellow-300 rounded-md">
-          <h3 className="text-lg font-bold mb-2">🧪 테스트 영역</h3>
-          <button
-            onClick={() => {
-              alert('메인 영역 새 문서 버튼 클릭됨!');
-              setShowArticleEditor(true);
-            }}
-            className="bg-green-600 text-white px-4 py-2 rounded mr-4"
-          >
-            🧪 테스트: 새 문서 작성
-          </button>
-          <button
-            onClick={() => {
-              alert('메인 영역 카테고리 버튼 클릭됨!');
-              setShowCategoryManager(true);
-            }}
-            className="bg-purple-600 text-white px-4 py-2 rounded"
-          >
-            🧪 테스트: 카테고리 관리
-          </button>
-        </div>
-
         {error && (
           <div className="mb-6 p-4 bg-yellow-100 border border-yellow-300 rounded-md text-yellow-800">
             {error}
@@ -329,21 +282,12 @@ export default function MainPage() {
         onUpdate={handleCategoryUpdate}
       />
 
-      {/* ArticleEditor 임시 교체 */}
-      {showArticleEditor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">새 문서 작성 (테스트)</h2>
-            <p className="mb-4">ArticleEditor 컴포넌트 테스트 중...</p>
-            <button 
-              onClick={() => setShowArticleEditor(false)}
-              className="bg-gray-500 text-white px-4 py-2 rounded"
-            >
-              닫기
-            </button>
-          </div>
-        </div>
-      )}
+      <ArticleEditor
+        article={editingArticle}
+        isOpen={showArticleEditor}
+        onClose={() => setShowArticleEditor(false)}
+        onUpdate={handleArticleUpdate}
+      />
 
       <ArticleViewer
         article={viewingArticle}
