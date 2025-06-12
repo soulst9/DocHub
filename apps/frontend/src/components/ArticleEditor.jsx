@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import ApiClient from '../utils/api';
 
 export default function ArticleEditor({ isOpen, onClose, onUpdate, editingArticle = null }) {
+  console.log('ArticleEditor 렌더링됨:', { isOpen, editingArticle });
+
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -20,8 +22,10 @@ export default function ArticleEditor({ isOpen, onClose, onUpdate, editingArticl
   // 카테고리 로드
   const loadCategories = async () => {
     try {
+      console.log('카테고리 로드 시작');
       const data = await ApiClient.getCategories();
       setCategories(data || []);
+      console.log('카테고리 로드 완료:', data);
     } catch (err) {
       console.error('카테고리 로드 실패:', err);
     }
@@ -29,11 +33,13 @@ export default function ArticleEditor({ isOpen, onClose, onUpdate, editingArticl
 
   // 폼 데이터 초기화
   useEffect(() => {
+    console.log('ArticleEditor useEffect 실행됨:', { isOpen, editingArticle });
     if (isOpen) {
       loadCategories();
       
       if (editingArticle) {
         // 수정 모드
+        console.log('수정 모드로 초기화');
         setFormData({
           title: editingArticle.title || '',
           content: editingArticle.content || '',
@@ -42,6 +48,7 @@ export default function ArticleEditor({ isOpen, onClose, onUpdate, editingArticl
         });
       } else {
         // 새 문서 모드
+        console.log('새 문서 모드로 초기화');
         setFormData({
           title: '',
           content: '',

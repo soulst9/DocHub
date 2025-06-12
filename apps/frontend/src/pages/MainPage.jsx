@@ -89,19 +89,37 @@ export default function MainPage() {
 
   // 문서 관련 핸들러
   const handleNewArticle = () => {
-    setEditingArticle(null);
-    setShowArticleEditor(true);
+    console.log('새 문서 버튼 클릭됨');
+    try {
+      setEditingArticle(null);
+      setShowArticleEditor(true);
+      console.log('새 문서 모달 상태 변경 완료');
+    } catch (error) {
+      console.error('새 문서 버튼 에러:', error);
+    }
   };
 
   const handleEditArticle = (article) => {
-    setEditingArticle(article);
-    setShowArticleEditor(true);
-    setShowArticleViewer(false);
+    console.log('문서 수정 버튼 클릭됨:', article);
+    try {
+      setEditingArticle(article);
+      setShowArticleEditor(true);
+      setShowArticleViewer(false);
+      console.log('수정 모달 상태 변경 완료');
+    } catch (error) {
+      console.error('문서 수정 에러:', error);
+    }
   };
 
   const handleViewArticle = (article) => {
-    setViewingArticle(article);
-    setShowArticleViewer(true);
+    console.log('문서 보기 클릭됨:', article);
+    try {
+      setViewingArticle(article);
+      setShowArticleViewer(true);
+      console.log('보기 모달 상태 변경 완료');
+    } catch (error) {
+      console.error('문서 보기 에러:', error);
+    }
   };
 
   const handleArticleUpdate = () => {
