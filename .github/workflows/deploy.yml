@@ -42,7 +42,7 @@ jobs:
             cd ../frontend
             pnpm install
             pnpm build
-            pm2 restart frontend || pm2 start "pnpm start" --name frontend
+            pm2 restart frontend || pm2 start "npx next start -p 3000" --name frontend
             
             echo "✅ 배포 완료!"
             pm2 status
