@@ -7,6 +7,7 @@ import ArticleList from '../components/ArticleList';
 import CategoryManager from '../components/CategoryManager';
 import ArticleEditor from '../components/ArticleEditor';
 import ArticleViewer from '../components/ArticleViewer';
+import Pagination from '../components/Pagination';
 import ApiClient from '../utils/api';
 
 export default function MainPage() {
@@ -19,6 +20,10 @@ export default function MainPage() {
   const [selectedTags, setSelectedTags] = useState([]);
   const [sortBy, setSortBy] = useState('newest'); // newest, oldest, title, category
   const [searchType, setSearchType] = useState('all'); // all, title, content, tags
+  
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
   
   // 모달 상태
   const [showCategoryManager, setShowCategoryManager] = useState(false);
@@ -160,7 +165,32 @@ export default function MainPage() {
     setSelectedCategory('');
     setSelectedTags([]);
     setSearchType('all');
+    setCurrentPage(1); // 검색 초기화 시 첫 페이지로
   };
+
+  // 페이지네이션 계산
+  const totalFilteredItems = filteredAndSortedArticles.length;
+  const totalPages = Math.ceil(totalFilteredItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageArticles = filteredAndSortedArticles.slice(startIndex, endIndex);
+
+  // 페이지 변경 핸들러
+  const handlePageChange = (page, newItemsPerPage = itemsPerPage) => {
+    if (newItemsPerPage !== itemsPerPage) {
+      setItemsPerPage(newItemsPerPage);
+      setCurrentPage(1); // 페이지 크기 변경 시 첫 페이지로
+    } else {
+      setCurrentPage(page);
+    }
+    // 페이지 변경 시 스크롤을 상단으로
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 검색/필터 변경 시 첫 페이지로 리셋
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, selectedTags, sortBy, searchType]);
 
   // 문서 관련 핸들러
   const handleNewArticle = () => {
@@ -327,7 +357,7 @@ export default function MainPage() {
               {allTags.length > 0 && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    태그 필터 ({selectedTags.length}개 선택됨)
+                    태그 필터링
                   </label>
                   <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                     {allTags.map((tag) => (
@@ -413,7 +443,7 @@ export default function MainPage() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">검색 결과</p>
-                  <p className="text-2xl font-bold text-gray-900">{filteredAndSortedArticles.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalFilteredItems}</p>
                 </div>
               </div>
             </CardContent>
@@ -431,19 +461,30 @@ export default function MainPage() {
                 </span>
               )}
             </h2>
-            {filteredAndSortedArticles.length > 0 && (
-              <p className="text-sm text-gray-600">
-                {filteredAndSortedArticles.length}개의 문서
-              </p>
-            )}
+            <div className="flex items-center gap-4">
+              {totalFilteredItems > 0 && (
+                <p className="text-sm text-gray-600">
+                  페이지 {currentPage} / {totalPages} (전체 {totalFilteredItems}개)
+                </p>
+              )}
+            </div>
           </div>
           
           <ArticleList 
-            articles={filteredAndSortedArticles}
+            articles={currentPageArticles}
             onEdit={handleEditArticle}
             onView={handleViewArticle}
             searchTerm={searchTerm}
             searchType={searchType}
+          />
+
+          {/* 페이지네이션 */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalFilteredItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
           />
         </div>
       </main>
