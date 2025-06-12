@@ -46,6 +46,11 @@ jobs:
             echo "🚀 백엔드 배포 시작..."
             cd apps/backend
             pnpm install
+            
+            # 데이터베이스 마이그레이션 실행
+            echo "🔄 데이터베이스 마이그레이션 실행..."
+            node run-migration.js
+            
             pm2 start app.js --name backend
             
             # 프론트엔드 배포
