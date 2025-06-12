@@ -155,14 +155,8 @@ export default function MainPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => {
-                  console.log('=== 새 문서 버튼 클릭 시작 ===');
-                  alert('새 문서 버튼 클릭됨!'); // 긴급 테스트
-                  console.log('Alert 표시 완료');
-                  console.log('현재 showArticleEditor 상태:', showArticleEditor);
-                  console.log('현재 editingArticle 상태:', editingArticle);
-                  handleNewArticle();
-                  console.log('handleNewArticle 호출 완료');
-                  console.log('=== 새 문서 버튼 클릭 종료 ===');
+                  alert('새 문서 버튼 클릭됨!');
+                  setShowArticleEditor(true);
                 }}
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2 transition-colors"
               >
@@ -312,12 +306,21 @@ export default function MainPage() {
         onUpdate={handleCategoryUpdate}
       />
 
-      <ArticleEditor
-        isOpen={showArticleEditor}
-        onClose={() => setShowArticleEditor(false)}
-        onUpdate={handleArticleUpdate}
-        editingArticle={editingArticle}
-      />
+      {/* ArticleEditor 임시 교체 */}
+      {showArticleEditor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">새 문서 작성 (테스트)</h2>
+            <p className="mb-4">ArticleEditor 컴포넌트 테스트 중...</p>
+            <button 
+              onClick={() => setShowArticleEditor(false)}
+              className="bg-gray-500 text-white px-4 py-2 rounded"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
 
       <ArticleViewer
         article={viewingArticle}
