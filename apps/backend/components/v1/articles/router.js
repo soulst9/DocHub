@@ -13,5 +13,7 @@ router.get('/:id', controller.getArticleById);
 router.put('/:id', validator.updateArticle, controller.updateArticle);
 // 문서 삭제
 router.delete('/:id', controller.deleteArticle);
+// 즐겨찾기 토글
+router.patch('/:id/favorite', controller.toggleFavorite);
 
 module.exports = router; 

@@ -75,4 +75,15 @@ exports.updateArticle = async (id, data) => {
 exports.deleteArticle = async (id) => {
   const deleted = await Article.destroy({ where: { id } });
   return deleted > 0;
+};
+
+exports.toggleFavorite = async (id) => {
+  const article = await Article.findByPk(id);
+  if (!article) return null;
+  
+  await article.update({
+    isFavorite: !article.isFavorite
+  });
+  
+  return article;
 }; 

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
-export default function ArticleList({ articles, onEdit, onView, searchTerm = '', searchType = 'all' }) {
+export default function ArticleList({ articles, onEdit, onView, onToggleFavorite, searchTerm = '', searchType = 'all' }) {
   if (!articles || articles.length === 0) {
     return (
       <div className="text-center py-12">
@@ -73,6 +73,19 @@ export default function ArticleList({ articles, onEdit, onView, searchTerm = '',
                 }
               </CardTitle>
               <div className="flex gap-1 ml-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onToggleFavorite?.(article)}
+                  className={`px-2 py-1 h-auto transition-colors ${
+                    article.isFavorite 
+                      ? 'text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 bg-yellow-50' 
+                      : 'text-gray-400 hover:text-yellow-600 hover:bg-yellow-50'
+                  }`}
+                  title={article.isFavorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}
+                >
+                  {article.isFavorite ? '⭐' : '☆'}
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"

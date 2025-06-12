@@ -64,6 +64,12 @@ class ApiClient {
     });
   }
 
+  async toggleFavorite(id) {
+    return this.request(`${API_CONFIG.ENDPOINTS.ARTICLES}/${id}/favorite`, {
+      method: 'PATCH',
+    });
+  }
+
   // Categories API
   async getCategories() {
     return this.request(API_CONFIG.ENDPOINTS.CATEGORIES);

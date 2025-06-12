@@ -47,4 +47,14 @@ exports.deleteArticle = async (req, res) => {
   } catch (err) {
     handleError(res, err);
   }
+};
+
+exports.toggleFavorite = async (req, res) => {
+  try {
+    const article = await service.toggleFavorite(req.params.id);
+    if (!article) return res.status(404).json({ message: 'Article not found' });
+    res.json(article);
+  } catch (err) {
+    handleError(res, err);
+  }
 }; 

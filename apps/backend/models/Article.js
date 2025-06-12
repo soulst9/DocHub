@@ -5,6 +5,7 @@ const Article = sequelize.define('Article', {
   title:      { type: DataTypes.STRING(200), allowNull: false },
   content:    { type: DataTypes.TEXT, allowNull: false },
   tags:       { type: DataTypes.JSON },
+  isFavorite: { type: DataTypes.BOOLEAN, defaultValue: false },
 }, {
   tableName: 'articles',
   timestamps: true,

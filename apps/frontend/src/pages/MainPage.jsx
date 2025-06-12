@@ -20,6 +20,7 @@ export default function MainPage() {
   const [selectedTags, setSelectedTags] = useState([]);
   const [sortBy, setSortBy] = useState('newest'); // newest, oldest, title, category
   const [searchType, setSearchType] = useState('all'); // all, title, content, tags
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
@@ -92,6 +93,11 @@ export default function MainPage() {
   // 고급 검색 및 필터링
   const filteredAndSortedArticles = (() => {
     let filtered = articles.filter(article => {
+      // 즐겨찾기 필터링
+      if (showFavoritesOnly && !article.isFavorite) {
+        return false;
+      }
+
       // 검색어 필터링
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
@@ -131,8 +137,13 @@ export default function MainPage() {
       return true;
     });
 
-    // 정렬
+    // 정렬 (즐겨찾기 우선 정렬 추가)
     filtered.sort((a, b) => {
+      // 즐겨찾기 우선 정렬
+      if (a.isFavorite !== b.isFavorite) {
+        return b.isFavorite - a.isFavorite;
+      }
+      
       switch (sortBy) {
         case 'oldest':
           return new Date(a.createdAt) - new Date(b.createdAt);
@@ -165,6 +176,7 @@ export default function MainPage() {
     setSelectedCategory('');
     setSelectedTags([]);
     setSearchType('all');
+    setShowFavoritesOnly(false);
     setCurrentPage(1); // 검색 초기화 시 첫 페이지로
   };
 
@@ -211,6 +223,21 @@ export default function MainPage() {
 
   const handleArticleUpdate = () => {
     loadData(); // 데이터 새로고침
+  };
+
+  const handleToggleFavorite = async (article) => {
+    try {
+      await ApiClient.toggleFavorite(article.id);
+      // 로컬 상태 업데이트
+      setArticles(prev => prev.map(a => 
+        a.id === article.id 
+          ? { ...a, isFavorite: !a.isFavorite }
+          : a
+      ));
+    } catch (err) {
+      console.error('즐겨찾기 토글 실패:', err);
+      alert('즐겨찾기 설정에 실패했습니다.');
+    }
   };
 
   const handleCategoryUpdate = () => {
@@ -353,6 +380,21 @@ export default function MainPage() {
                 </div>
               </div>
 
+              {/* 즐겨찾기 필터 */}
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showFavoritesOnly}
+                    onChange={(e) => setShowFavoritesOnly(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    ⭐ 즐겨찾기만 보기
+                  </span>
+                </label>
+              </div>
+
               {/* 세 번째 행: 태그 필터링 */}
               {allTags.length > 0 && (
                 <div>
@@ -379,7 +421,7 @@ export default function MainPage() {
               )}
 
               {/* 선택된 필터 표시 */}
-              {(searchTerm || selectedCategory || selectedTags.length > 0) && (
+              {(searchTerm || selectedCategory || selectedTags.length > 0 || showFavoritesOnly) && (
                 <div className="pt-2 border-t border-gray-200">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm text-gray-600">활성 필터:</span>
@@ -391,6 +433,11 @@ export default function MainPage() {
                     {selectedCategory && (
                       <Badge variant="secondary" className="text-xs">
                         카테고리: {categories.find(c => c.id.toString() === selectedCategory)?.name}
+                      </Badge>
+                    )}
+                    {showFavoritesOnly && (
+                      <Badge variant="secondary" className="text-xs">
+                        ⭐ 즐겨찾기만
                       </Badge>
                     )}
                     {selectedTags.map(tag => (
@@ -406,7 +453,7 @@ export default function MainPage() {
         </div>
 
         {/* 통계 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
@@ -416,6 +463,20 @@ export default function MainPage() {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">전체 문서</p>
                   <p className="text-2xl font-bold text-gray-900">{articles.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <span className="text-2xl">⭐</span>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">즐겨찾기</p>
+                  <p className="text-2xl font-bold text-gray-900">{articles.filter(a => a.isFavorite).length}</p>
                 </div>
               </div>
             </CardContent>
@@ -474,6 +535,7 @@ export default function MainPage() {
             articles={currentPageArticles}
             onEdit={handleEditArticle}
             onView={handleViewArticle}
+            onToggleFavorite={handleToggleFavorite}
             searchTerm={searchTerm}
             searchType={searchType}
           />
