@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ApiClient from '../utils/api';
+import CommentSection from './CommentSection';
 
 export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpdate }) {
   const [loading, setLoading] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   if (!isOpen || !article) return null;
 
@@ -59,6 +61,15 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpda
             </div>
           </div>
           <div className="flex gap-2 ml-4">
+            <Button
+              onClick={() => setShowComments(!showComments)}
+              variant="outline"
+              size="sm"
+              className={`${showComments ? 'bg-blue-50 text-blue-700' : 'text-gray-600'} hover:text-blue-700 hover:bg-blue-50`}
+              disabled={loading}
+            >
+              💬 댓글
+            </Button>
             <Button
               onClick={() => onEdit?.(article)}
               variant="outline"
@@ -199,6 +210,12 @@ export default function ArticleViewer({ article, isOpen, onClose, onEdit, onUpda
               {article.content || '내용이 없습니다.'}
             </ReactMarkdown>
           </div>
+
+          {/* 댓글 섹션 */}
+          <CommentSection 
+            articleId={article.id} 
+            isOpen={showComments}
+          />
         </div>
 
         {/* 푸터 */}

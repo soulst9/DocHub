@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const sequelize = require('./config/database');
-const { User, Category, Article, Tag, ArticleTag } = require('./models');
+const { User, Category, Article, Tag, ArticleTag, Comment } = require('./models');
 
 const app = express();
 app.use(express.json());
@@ -17,11 +17,13 @@ const userRouterV1 = require('./components/v1/users');
 const categoryRouterV1 = require('./components/v1/categories');
 const articleRouterV1 = require('./components/v1/articles');
 const uploadRouterV1 = require('./components/v1/uploads/router');
+const commentRouterV1 = require('./comments/router');
 
 app.use('/api/v1/users', userRouterV1);
 app.use('/api/v1/categories', categoryRouterV1);
 app.use('/api/v1/articles', articleRouterV1);
 app.use('/api/v1/uploads', uploadRouterV1);
+app.use('/api/v1/comments', commentRouterV1);
 
 console.log(process.env.DB_HOST);
 

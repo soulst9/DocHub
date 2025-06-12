@@ -11,26 +11,28 @@
     "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "autoprefixer": "^10.4.21",
     "eslint": "^8.0.0",
     "eslint-config-next": "^14.0.0",
-    "typescript": "^5.0.0",
-    "autoprefixer": "^10.4.21",
     "jest": "^30.0.0",
     "postcss": "^8.5.5",
     "supertest": "^7.1.1",
-    "tailwindcss": "^4.1.10"
+    "tailwindcss": "^4.1.10",
+    "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-separator": "^1.1.7",
+    "bcrypt": "^6.0.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "express-validator": "^7.2.1",
+    "lucide-react": "^0.400.0",
     "next": "^14.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "@radix-ui/react-select": "^2.0.0",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.0.0",
-    "lucide-react": "^0.400.0",
     "tailwind-merge": "^2.0.0",
-    "tailwindcss-animate": "^1.0.7",
-    "bcrypt": "^6.0.0",
-    "express-validator": "^7.2.1"
+    "tailwindcss-animate": "^1.0.7"
   }
 }
