@@ -91,6 +91,21 @@ class ApiClient {
     });
   }
 
+  // 버전 관리 API
+  async getVersions(articleId) {
+    return this.request(`${API_CONFIG.ENDPOINTS.ARTICLES}/${articleId}/versions`);
+  }
+
+  async getVersion(articleId, versionNumber) {
+    return this.request(`${API_CONFIG.ENDPOINTS.ARTICLES}/${articleId}/versions/${versionNumber}`);
+  }
+
+  async restoreVersion(articleId, versionNumber) {
+    return this.request(`${API_CONFIG.ENDPOINTS.ARTICLES}/${articleId}/versions/${versionNumber}/restore`, {
+      method: 'POST',
+    });
+  }
+
   // Upload API
   async uploadImage(file) {
     const formData = new FormData();

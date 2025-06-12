@@ -16,4 +16,9 @@ router.delete('/:id', controller.deleteArticle);
 // 즐겨찾기 토글
 router.patch('/:id/favorite', controller.toggleFavorite);
 
+// 버전 관리 라우트
+router.get('/:id/versions', controller.getVersions);
+router.get('/:id/versions/:versionNumber', controller.getVersion);
+router.post('/:id/versions/:versionNumber/restore', controller.restoreVersion);
+
 module.exports = router; 

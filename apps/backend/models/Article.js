@@ -12,4 +12,29 @@ const Article = sequelize.define('Article', {
   timestamps: true,
 });
 
+// 관계 설정을 위한 함수
+Article.associate = (models) => {
+  // 버전 관계
+  Article.hasMany(models.ArticleVersion, {
+    foreignKey: 'article_id',
+    as: 'versions',
+    onDelete: 'CASCADE',
+  });
+  
+  // 기존 관계들
+  if (models.Category) {
+    Article.belongsTo(models.Category, {
+      foreignKey: 'category_id',
+      as: 'Category',
+    });
+  }
+  
+  if (models.User) {
+    Article.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      as: 'User',
+    });
+  }
+};
+
 module.exports = Article; 

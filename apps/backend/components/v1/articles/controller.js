@@ -57,4 +57,34 @@ exports.toggleFavorite = async (req, res) => {
   } catch (err) {
     handleError(res, err);
   }
+};
+
+// 버전 관리 관련 컨트롤러
+exports.getVersions = async (req, res) => {
+  try {
+    const versions = await service.getVersions(req.params.id);
+    res.json(versions);
+  } catch (err) {
+    handleError(res, err);
+  }
+};
+
+exports.getVersion = async (req, res) => {
+  try {
+    const version = await service.getVersionById(req.params.id, req.params.versionNumber);
+    if (!version) return res.status(404).json({ message: 'Version not found' });
+    res.json(version);
+  } catch (err) {
+    handleError(res, err);
+  }
+};
+
+exports.restoreVersion = async (req, res) => {
+  try {
+    const article = await service.restoreVersion(req.params.id, req.params.versionNumber);
+    if (!article) return res.status(404).json({ message: 'Version not found' });
+    res.json(article);
+  } catch (err) {
+    handleError(res, err);
+  }
 }; 
