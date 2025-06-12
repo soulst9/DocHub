@@ -1,10 +1,20 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const sequelize = require('./config/database');
-const User = require('./models/User');
+const { User, Category, Article, Tag, ArticleTag } = require('./models');
 
 const app = express();
 app.use(express.json());
+app.use(cors()); // CORS 설정 추가
+
+// v1 라우터 등록
+const userRouterV1 = require('./components/v1/users');
+const categoryRouterV1 = require('./components/v1/categories');
+const articleRouterV1 = require('./components/v1/articles');
+app.use('/api/v1/users', userRouterV1);
+app.use('/api/v1/categories', categoryRouterV1);
+app.use('/api/v1/articles', articleRouterV1);
 
 console.log(process.env.DB_HOST);
 
@@ -17,10 +27,12 @@ app.get('/api/health', (req, res) => {
 sequelize.sync({ alter: true })
   .then(() => {
     console.log('DB 및 테이블이 성공적으로 생성되었습니다.');
-    app.listen(3000, () => {
-      console.log('Express 서버가 3000번 포트에서 실행 중입니다.');
+    app.listen(3001, () => {
+      console.log('Express 서버가 3001번 포트에서 실행 중입니다.');
     });
   })
   .catch(err => {
     console.error('DB 동기화 실패:', err);
-  }); 
+  });
+
+module.exports = app;

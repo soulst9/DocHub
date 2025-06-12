@@ -1,0 +1,51 @@
+name: Run Backend Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: |
+          cd apps/backend
+          pnpm install
+
+      - name: Run tests
+        run: |
+          cd apps/backend
+          pnpm test
+
+      - name: Clean up test data
+        if: always()
+        run: |
+          cd apps/backend
+          node scripts/cleanupTestData.js
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.payload.pull_request ? context.payload.pull_request.number : context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ 테스트가 실패했습니다. 로그를 확인해 주세요.'
+            }); 

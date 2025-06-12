@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -30,6 +30,19 @@ jobs:
           script: |
             cd /home/ec2-user/DocHub
             git pull origin main
+            
+            # 백엔드 배포
+            echo "🚀 백엔드 배포 시작..."
             cd apps/backend
             pnpm install
-            pm2 restart app || pm2 start app.js --name app
+            pm2 restart backend || pm2 start app.js --name backend
+            
+            # 프론트엔드 배포
+            echo "🚀 프론트엔드 배포 시작..."
+            cd ../frontend
+            pnpm install
+            pnpm build
+            pm2 restart frontend || pm2 start "pnpm start" --name frontend
+            
+            echo "✅ 배포 완료!"
+            pm2 status
